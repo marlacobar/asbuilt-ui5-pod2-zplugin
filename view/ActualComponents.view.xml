@@ -1,0 +1,114 @@
+<mvc:View
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:f="sap.f"
+    xmlns:uxap="sap.uxap"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:layout="sap.ui.layout"
+    controllerName="mhp.pod2.zplugins.asbuiltreportplugin.controller.ActualComponents"
+    height="100%"
+>
+    <uxap:ObjectPageLayout
+        busy="{viewModel>/busy}"
+        busyIndicatorDelay="0" >
+        <uxap:headerTitle>
+            <uxap:ObjectPageDynamicHeaderTitle >
+                <uxap:expandedHeading>
+                    <Title text="{i18n>asBuilt.tbl.actualComponents}" wrapping="true" />
+                </uxap:expandedHeading>
+
+                <uxap:actions>
+                    <Button icon="sap-icon://decline" text="" press=".onCloseSecondColumn"/>
+                </uxap:actions>
+            </uxap:ObjectPageDynamicHeaderTitle>
+        </uxap:headerTitle>
+
+        <uxap:sections>
+            <uxap:ObjectPageSection showTitle="false">
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection>
+                        <uxap:blocks>
+                            <Table
+                                id="idActualComponentTable"
+                                inset="false"
+                                sticky="ColumnHeaders,HeaderToolbar"
+                                items="{ 
+                                    path: 'AsBuilt>/selectedComponent/actualComponents'
+                                }" 
+                                ariaLabelledBy="title"
+                                fixedLayout="true"
+                                growing="true"
+                                popinLayout="GridSmall"
+                                autoPopinMode="true" >
+                                <columns>
+                                    <Column>
+                                        <Text text="{i18n>asBuilt.tbl.component}" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="{i18n>asBuilt.tbl.version}" />
+                                    </Column>
+                                    <Column visible="false">
+                                        <Text text="{i18n>asBuilt.tbl.state}" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="{i18n>asBuilt.tbl.qtyRequired}" />
+                                    </Column>
+                                    <Column >
+                                        <Text text="{i18n>asBuilt.tbl.qtyAssembled}" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="{i18n>asBuilt.tbl.assemblyType}" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="{i18n>asBuilt.tbl.assemblyDateTime}" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="{i18n>asBuilt.tbl.assembledBy}" />
+                                    </Column>
+                                    <Column>
+                                    </Column>
+                                </columns>
+
+                                <items>
+                                    <ColumnListItem vAlign="Middle">
+                                        <cells>
+                                            <ObjectIdentifier title="{AsBuilt>BOM_COMPONENT_MATERIAL}" text="{AsBuilt>MATERIAL_DESCRIPTION}" />
+                                            <Text text="{AsBuilt>BOM_COMPONENT_MATERIAL_VERSION}" />
+                                            <Text text="{AsBuilt>state}" />
+                                            <ObjectNumber number="{AsBuilt>QUANTITY_IN_BASE_UOM}" unit="{AsBuilt>BASE_UOM}" />
+                                            <ObjectNumber number="{AsBuilt>QUANTITY_IN_REPORTED_UOM}" unit="{AsBuilt>REPORTED_UOM}" />
+                                            <ObjectStatus
+                                                text="{
+                                                    parts: [
+                                                        {path: 'AsBuilt>EVENT_TYPE'}
+                                                    ],
+                                                    formatter: '.formatter.getEventTypeText'
+                                                }"
+                                                state="{
+                                                    parts: [
+                                                        {path: 'AsBuilt>EVENT_TYPE'}
+                                                    ],
+                                                    formatter: '.formatter.getEventTypeState'
+                                                }" />
+                                            <Text text="{
+                                                parts: [
+                                                    {path: 'AsBuilt>EVENT_OCCURRED_AT'}
+                                                ],
+                                                formatter: '.formatter.dmcTimeZoneDate'
+                                            }" />  
+                                            <Text text="{AsBuilt>USER_ID}" />
+                                            <Link text="{i18n>asBuilt.tbl.assyData}" press=".onOpenDataFieldsPopover" />
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+        </uxap:sections>
+    </uxap:ObjectPageLayout>
+</mvc:View>

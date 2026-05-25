@@ -1,0 +1,159 @@
+<mvc:View
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:f="sap.f"
+    xmlns:uxap="sap.uxap"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:layout="sap.ui.layout"
+    controllerName="mhp.pod2.zplugins.asbuiltreportplugin.controller.BomComponents"
+    width="100%"
+    height="100%"
+>
+    <uxap:ObjectPageLayout
+        id="idObjectPageLayout"
+        busy="{viewModel>/busy}"
+        busyIndicatorDelay="0"
+    >
+        <uxap:headerTitle>
+            <uxap:ObjectPageHeader objectSubtitle="{i18n>asBuilt.sfcDetails}"  />
+        </uxap:headerTitle>
+        <uxap:headerContent>
+            <FlexBox wrap="Wrap" renderType="Bare" >
+                <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                    <ObjectStatus
+                        title="{i18n>asBuilt.f.materialAndVersion}"
+                        text="{
+                                parts: [
+                                    { path: 'AsBuilt>/material/material' },
+                                    { path: 'AsBuilt>/material/version' }
+                                ],
+                                formatter: '.formatter.getValueAndVersion'
+                            }"
+                    />
+                    <ObjectStatus
+                        title="{i18n>asBuilt.f.description}"
+                        text="{AsBuilt>/material/description}"
+                    />
+                </layout:VerticalLayout>
+
+                <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                    <ObjectStatus
+                        title="{i18n>asBuilt.f.routingAndVersion}"
+                        text="{
+                                parts: [
+                                    { path: 'AsBuilt>/routing/routing' },
+                                    { path: 'AsBuilt>/routing/version' }
+                                ],
+                                formatter: '.formatter.getValueAndVersion'
+                            }"
+                    />
+                    <ObjectStatus
+                        title="{i18n>asBuilt.f.bomAndVersion}"
+                        text="{
+                                parts: [
+                                    { path: 'AsBuilt>/bom/bom' },
+                                    { path: 'AsBuilt>/bom/version' }
+                                ],
+                                formatter: '.formatter.getValueAndVersion'
+                            }"
+                    />
+                </layout:VerticalLayout>
+
+                <layout:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                    <Label text="{i18n>asBuilt.f.sfcStatus}:"/>
+                    <ObjectStatus
+                        class="sapMObjectStatusLarge"
+                        text="{AsBuilt>/sfcStatus}"
+                    />
+                </layout:VerticalLayout>
+            </FlexBox>
+        </uxap:headerContent>
+
+        <uxap:sections>
+            <uxap:ObjectPageSection title="{i18n>asBuilt.tbl.bomComponents}" titleUppercase="false" class="sapUiResponsiveMargin">
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection>
+                        <uxap:blocks>
+                            <Table
+                                id="idAsBuiltTable"
+                                inset="false"
+                                sticky="ColumnHeaders,HeaderToolbar"
+                                items="{ 
+                                        path: 'AsBuilt>/components',
+                                        sorter: {
+                                            path: 'bomComponent/sequence'
+                                        } 
+                                    }"
+                                itemPress=".onItemPress"
+                                mode="SingleSelectMaster"
+                                ariaLabelledBy="title"
+                                fixedLayout="true"
+                                growing="true"
+                                popinLayout="GridSmall"
+                                autoPopinMode="true" >
+                                <columns>
+                                    <Column importance="High" demandPopin="true">
+                                        <Text text="{i18n>asBuilt.tbl.sequence}" />
+                                    </Column>
+                                    <Column importance="High" demandPopin="true">
+                                        <Text text="{i18n>asBuilt.tbl.component}" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="{i18n>asBuilt.tbl.version}" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="{i18n>asBuilt.tbl.operation}" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="{i18n>asBuilt.tbl.qtyRequired}" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="{i18n>asBuilt.tbl.qtyAssembled}" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="{i18n>asBuilt.tbl.componentType}" />
+                                    </Column>
+                                </columns>
+
+                                <items>
+                                    <ColumnListItem
+                                        vAlign="Middle"
+                                        type="Navigation" >
+                                        <cells>
+                                            <Text text="{AsBuilt>bomComponent/sequence}" />
+                                            <ObjectIdentifier
+                                                title="{AsBuilt>bomComponent/component}"
+                                                text="{AsBuilt>bomComponent/description}" />
+                                            <Text text="{AsBuilt>bomComponent/version}" />
+                                            <Text text="{AsBuilt>bomComponent/operation}" />
+                                            <ObjectNumber
+                                                number="{AsBuilt>bomComponent/quantityRequired}"
+                                                unit="{AsBuilt>bomComponent/uom}" />
+                                            <ObjectNumber
+                                                number="{AsBuilt>bomComponent/quantityAssembled}"
+                                                unit="{AsBuilt>bomComponent/uom}" />
+                                            <Text text="{AsBuilt>bomComponent/componentType}" />
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+        </uxap:sections>
+    </uxap:ObjectPageLayout>
+						
+    <HBox
+        class="sapUiSmallMargin"
+        alignItems="Start"
+        justifyContent="Center" >
+        <BusyIndicator
+            size="0.5rem"  
+            visible="{viewModel>/loadingAsBuilt}"
+            busyIndicatorDelay="0" />
+    </HBox>
+</mvc:View>
