@@ -171,7 +171,8 @@ sap.ui.define([
          * @param {Object} oBomComponents - BOM components structure containing a `components` array.
          * @param {Object} oBomComponents.components[].bomComponent - BOM component metadata
          *        including `component`, `version`, and `sequence`.
-         * @param {sap.ui.model.json.JSONModel} oModel - UI5 JSON model used to store and refresh enriched data.
+         * @param {sap.ui.model.json.JSONModel} oAsBuiltModel - UI5 JSON model used to store and refresh enriched data.
+         * @param {sap.ui.model.json.JSONModel} oViewModel - View model used to control busy state and other UI flags.
          * @returns {Promise<void>} A promise that resolves when the assembled components have been
          * processed, enriched with material descriptions and data fields, filtered by state,
          * and updated in the provided model.
@@ -187,27 +188,21 @@ sap.ui.define([
          * 6. Updates the provided JSON model with the resulting enriched components and progress percentage.
          * Errors are caught and displayed via a MessageToast.
          */
-        getAssembledComponents: async function (oRequest, oBomComponents, oModel) {
+        getAssembledComponents: async function (oRequest, oBomComponents, oAsBuiltModel, oViewModel) {
             try {
-                const aData = await this.getSfcAssemblyEvents(oRequest);
-                let oTemporalData = { ...oBomComponents, components: [] };
-
-                const total = oBomComponents.components.length;
-                let loaded = 0;
-
-                oModel.setProperty("/progress", {
-                    percent: 0,
-                    display: `0%`
-                });
+                const aData = await this.getSfcAssemblyEvents(oRequest),
+                    aComponents = oBomComponents.components,
+                    iTotal = aComponents.length;
+                let iLoaded = 0;
 
                 // Batch Size to process components in smaller groups (5 at a time)
-                const batchSize = 5;
+                const iBatchSize = 5;
 
-                for (let i = 0; i < sortedComponents.length; i += batchSize) {
-                    const batch = sortedComponents.slice(i, i + batchSize);
+                for (let i = 0; i < aComponents.length; i += iBatchSize) {
+                    const oBatch = aComponents.slice(i, i + iBatchSize);
 
                     const results = await Promise.all(
-                        batch.map(async (c) => {
+                        oBatch.map(async (c) => {
                             const { component, version, sequence } = c.bomComponent;
 
                             const aActualComponents = aData.filter(item =>
@@ -241,44 +236,49 @@ sap.ui.define([
                             c.actualComponents = enriched;
 
                             // componentState Filter
-                            let include = false;
-                            
+                            let bInclude = false;
                             switch (oRequest.componentState) {
-                                case "All": include = true; break;
+                                case "All":
+                                    bInclude = true;
+                                    break;
                                 case "Assembled":
                                     const assembled = c.actualComponents.filter(a => a.EVENT_TYPE !== "COMPONENT_REMOVE");
-                                    if (assembled.length > 0) { c.actualComponents = assembled; include = true; }
+                                    if (assembled.length > 0) { c.actualComponents = assembled; bInclude = true; }
                                     break;
                                 case "Unassembled":
                                     const hasRemoveEvents = c.actualComponents.some(a => a.EVENT_TYPE === "COMPONENT_REMOVE");
-                                    include = (c.actualComponents.length === 0 || hasRemoveEvents);
+                                    bInclude = (c.actualComponents.length === 0 || hasRemoveEvents);
                                     break;
                                 case "AssembledUnassembled":
                                     const assembledUnassembled = c.actualComponents.filter(a => a.EVENT_TYPE !== "COMPONENT_REMOVE");
                                     if (c.actualComponents.length === 0 || assembledUnassembled.length > 0) {
                                         c.actualComponents = assembledUnassembled;
-                                        include = true;
+                                        bInclude = true;
                                     }
                                     break;
                                 case "Removed":
                                     const removed = c.actualComponents.filter(a => a.EVENT_TYPE === "COMPONENT_REMOVE");
-                                    if (removed.length > 0) { c.actualComponents = removed; include = true; }
+                                    if (removed.length > 0) { c.actualComponents = removed; bInclude = true; }
                                     break;
                             }
 
-                            return include ? c : null;
+                            return bInclude ? c : null;
                         })
                     );
 
-                    results.filter(Boolean).forEach(r => oTemporalData.components.push(r));
+                    results.filter(Boolean).forEach(r => {
+                        const currentComponents = oAsBuiltModel.getProperty("/components") || [];
+                        oAsBuiltModel.setProperty("/components", [...currentComponents, r]);
+                    });
 
-                    oModel.setData(oTemporalData);
-                    oModel.refresh(true);
+                    if (oAsBuiltModel.getProperty("/components").length > 0) {
+                        oViewModel.setProperty("/busy", false);
+                    }
 
-                    // Progress indicator
-                    loaded += batch.length;
-                    const percent = Math.round((loaded / total) * 100);
-                    oModel.setProperty("/progress", {
+                    // Update progress indicator
+                    iLoaded += results.filter(Boolean).length;
+                    const percent = Math.round((iLoaded / iTotal) * 100);
+                    oAsBuiltModel.setProperty("/progress", {
                         percent,
                         display: `${percent}%`
                     });

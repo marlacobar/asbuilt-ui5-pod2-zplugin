@@ -158,14 +158,4 @@
             </uxap:ObjectPageSection>
         </uxap:sections>
     </uxap:ObjectPageLayout>
-						
-    <HBox
-        class="sapUiSmallMargin"
-        alignItems="Start"
-        justifyContent="Center" >
-        <BusyIndicator
-            size="0.5rem"  
-            visible="{viewModel>/loadingAsBuilt}"
-            busyIndicatorDelay="0" />
-    </HBox>
 </mvc:View>

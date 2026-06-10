@@ -60,6 +60,7 @@ sap.ui.define([
             const oView = this.getView(),
                 oViewModel = oView.getModel("viewModel"),
                 oViewModelData = oViewModel.getData(),
+                oAsBuiltModel = oView.getModel("AsBuilt"),
                 oBundle = oView.getModel("i18n").getResourceBundle();
 
             const sSfc = this.byId("idSfcInput").getValue(),
@@ -75,14 +76,17 @@ sap.ui.define([
             // Set one column layout
             const oFCL = oView.byId("fcl").setLayout("OneColumn");
 
-            // Initialize ProgressIndicator Model
-            oView.getModel("AsBuilt").setProperty("/progress", {
-                percent: 0,
-                display: `0%`
+            // Initialize AsBuilt Model
+            oAsBuiltModel.setData({
+                material: {},
+                routing: {},
+                bom: {},
+                sfcStatus: "",
+                components: [],
+                progress: { percent: 0, display: "0%" }
             });
 
             oViewModel.setProperty("/busy", true);
-            oView.setModel(new JSONModel(), "AsBuilt");
 
             let oParams = {
                 IN_PLANT: oViewModelData.plant,
@@ -93,9 +97,6 @@ sap.ui.define([
 
             const oBomComponents = await this.Commons.getSfcDetail(oParams);
             
-            oViewModel.setProperty("/loadingAsBuilt", true);
-            oViewModel.setProperty("/busy", false);            
-
 
             // ===========================================================================
             // Async search for assembled components
@@ -105,11 +106,10 @@ sap.ui.define([
                 componentState: sComponentState
             };
 
-            this.Commons.getAssembledComponents(oAssyParams, oBomComponents, oView.getModel("AsBuilt"))
-                .then((oData) => {
-                    oViewModel.setProperty("/loadingAsBuilt", false);
-                })
+            this.Commons.getAssembledComponents(oAssyParams, oBomComponents, oAsBuiltModel, oViewModel)
+                .then((oData) => {})
                 .catch((oError) => {
+                    oViewModel.setProperty("/busy", false);
                     MessageToast.show(oError.message);
                 });
         },
