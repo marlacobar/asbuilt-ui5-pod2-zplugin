@@ -75,6 +75,12 @@ sap.ui.define([
             // Set one column layout
             const oFCL = oView.byId("fcl").setLayout("OneColumn");
 
+            // Initialize ProgressIndicator Model
+            oView.getModel("AsBuilt").setProperty("/progress", {
+                percent: 0,
+                display: `0%`
+            });
+
             oViewModel.setProperty("/busy", true);
             oView.setModel(new JSONModel(), "AsBuilt");
 

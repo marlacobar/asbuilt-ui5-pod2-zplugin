@@ -18,63 +18,10 @@ sap.ui.define([
     const oMdoClient = ODataV4Client.getMdoClient();
 
     return {
-        getOrder: async function (sPlant, sOrder) {
-            let oParams = {
-                plant: sPlant,
-                order: sOrder
-            };
+        // ------------------------------------------------------------------------------
+        // Production Processes
+        // ------------------------------------------------------------------------------
 
-            let ordersList = await ApiClient.order.getOrder(oParams);
-            return ordersList;
-        },
-
-        getWorkCenters: async function (sPlant, sWorkCenter = "") {
-            const oParams = {
-                plant: sPlant
-            };
-
-            let mapWorkCenters = new Map();
-            let aWorkCenterList = await ApiClient.workcenter.getWorkCenters(oParams);
-
-            aWorkCenterList.forEach((oWorkCenter) => {
-                mapWorkCenters.set(oWorkCenter.workCenter, oWorkCenter)
-            });
-
-            if (sWorkCenter) return mapWorkCenters.get(sWorkCenter);
-
-            return mapWorkCenters;
-        },
-
-        getResources: async function (sPlant, sResource = "") {
-            const oParams = {
-                plant: sPlant
-            };
-
-            let mapResources = new Map();
-            let aResourceList = await ApiClient.resource.getResources(oParams);
-
-            aResourceList.forEach((oResource) => {
-                mapResources.set(oResource.resource, oResource)
-            });
-
-            if (sResource) return mapResources.get(sResource);
-
-            return mapResources;
-        },
-
-        getRouting: async function (sPlant, oRouting) {
-            let sUrl = `${ApiPaths.API_GATEWAY_MS_PATH}/routing/v1/routings/routingSteps`;
-            let oParameters = {
-                plant: sPlant,
-                routing: oRouting.routing,
-                type: oRouting.type,
-                version: oRouting.version
-            };
-
-            let oRoutingDetails = await RestClient.get(sUrl, oParameters);
-
-            return oRoutingDetails.routingSteps;
-        },
 
         /**
          * Retrieves SFC data from the exposed Production Process API: P_AsBuiltDataReport_GetSfcData.
@@ -98,6 +45,25 @@ sap.ui.define([
             return oData;
         },
 
+
+        // ------------------------------------------------------------------------------
+        // MDOs
+        // ------------------------------------------------------------------------------
+
+
+        /**
+         * Retrieve the material description text from the MDO service.
+         *
+         * @async
+         * @function getMaterialText
+         * @param {Object} oRequest - Request parameters for the query.
+         * @param {string} oRequest.plant - Plant identifier.
+         * @param {string} oRequest.material - Material identifier.
+         * @param {number} [oRequest.skip=0] - Number of records to skip (for pagination).
+         * @param {number} [oRequest.top=1] - Maximum number of records to retrieve (default is 1).
+         * @returns {Promise<string>} A promise that resolves to the material description text,
+         * or an empty string if no description is found.
+         */
         getMaterialText: async function (oRequest) {
             const sFilter = this._objectToODataFilterString({
                 PLANT: oRequest.plant,
@@ -122,15 +88,15 @@ sap.ui.define([
          *
          * @async
          * @function getSFCAssemblyEvents
-         * @param {object} oRequest Request parameters.
-         * @param {string} oRequest.plant Plant identifier.
-         * @param {string} oRequest.sfc SFC identifier.
-         * @param {number} [oRequest.skip=0] Number of records to skip.
+         * @param {object} oRequest - Request parameters.
+         * @param {string} oRequest.plant - Plant identifier.
+         * @param {string} oRequest.sfc - SFC identifier.
+         * @param {number} [oRequest.skip=0] - Number of records to skip.
          * @returns {Promise<object[]>} Promise resolving to an array of SFC assembly event records.
          */
         getSfcAssemblyEvents: async function (oRequest) {
             const bRemoved = oRequest.componentState === 'Removed' ? 'COMPONENT_REMOVE' : undefined;
-            
+
             const sFilter = this._objectToODataFilterString({
                 PLANT: oRequest.plant,
                 SFC: oRequest.sfc,
@@ -159,6 +125,20 @@ sap.ui.define([
             return aResponse;
         },
 
+        /**
+         * Retrieve SFC Assembly Data Field records from the MDO service.
+         *
+         * @async
+         * @function getSfcAssemblyDataField
+         * @param {Object} oRequest - Request parameters for the query.
+         * @param {string} oRequest.plant - Plant identifier.
+         * @param {string} oRequest.sfc - Shop Floor Control (SFC) identifier.
+         * @param {string|undefined} oRequest.sfcAssyEventId - SFC Assembly Event ID, may be undefined.
+         * @param {number} [oRequest.skip=0] - Number of records to skip (for pagination).
+         * @param {number} [oRequest.top=1000] - Maximum number of records to retrieve.
+         * @returns {Promise<Object[]>} A promise that resolves to an array of assembly data field objects,
+         * each containing COMPONENT_INVENTORY, DATA_FIELD_LABEL, DATA_FIELD_VALUE, and IS_DELETED.
+         */
         getSfcAssemblyDataField: async function (oRequest) {
             const sFilter = this._objectToODataFilterString({
                 PLANT: oRequest.plant,
@@ -170,8 +150,7 @@ sap.ui.define([
                 $skip: oRequest.skip || 0,
                 $top: oRequest.top || 1000,
                 $filter: sFilter,
-                $select: `*`,
-                //COMPONENT_INVENTORY,DATA_FIELD_LABEL,DATA_FIELD_VALUE,IS_DELETED
+                $select: `COMPONENT_INVENTORY,DATA_FIELD_LABEL,DATA_FIELD_VALUE,IS_DELETED`,
             };
 
             const [aResponse] = await oMdoClient.getPage(MDO.SFCAssemblyDataField, oParameters);
@@ -179,24 +158,66 @@ sap.ui.define([
             return aResponse;
         },
 
+        /**
+         * Retrieve and enrich assembled component data for a given SFC request.
+         *
+         * @async
+         * @function getAssembledComponents
+         * @param {Object} oRequest - Request parameters for the query.
+         * @param {string} oRequest.plant - Plant identifier.
+         * @param {string} oRequest.sfc - Shop Floor Control (SFC) identifier.
+         * @param {string} [oRequest.componentState="All"] - Component state filter
+         *        ("All", "Assembled", "Unassembled", "AssembledUnassembled", "Removed").
+         * @param {Object} oBomComponents - BOM components structure containing a `components` array.
+         * @param {Object} oBomComponents.components[].bomComponent - BOM component metadata
+         *        including `component`, `version`, and `sequence`.
+         * @param {sap.ui.model.json.JSONModel} oModel - UI5 JSON model used to store and refresh enriched data.
+         * @returns {Promise<void>} A promise that resolves when the assembled components have been
+         * processed, enriched with material descriptions and data fields, filtered by state,
+         * and updated in the provided model.
+         *
+         * @description
+         * This function:
+         * 1. Retrieves assembly events for the given SFC.
+         * 2. Iterates over BOM components in batches to avoid blocking the event loop.
+         * 3. Matches BOM components with actual assembly events.
+         * 4. Enriches each component with material description and assembly data fields.
+         * 5. Applies filtering based on the requested component state ("All", "Assembled", "Unassembled",
+         *    "AssembledUnassembled", "Removed").
+         * 6. Updates the provided JSON model with the resulting enriched components and progress percentage.
+         * Errors are caught and displayed via a MessageToast.
+         */
         getAssembledComponents: async function (oRequest, oBomComponents, oModel) {
             try {
                 const aData = await this.getSfcAssemblyEvents(oRequest);
                 let oTemporalData = { ...oBomComponents, components: [] };
 
-                await Promise.all(
-                    oBomComponents.components.map(async (c) => {
-                        const { component, version, sequence } = c.bomComponent;
+                const total = oBomComponents.components.length;
+                let loaded = 0;
 
-                        const aActualComponents = aData.filter(item =>
-                            item.BOM_COMPONENT_MATERIAL === component &&
-                            item.BOM_COMPONENT_MATERIAL_VERSION === version &&
-                            item.BOM_COMPONENT_SEQUENCE === sequence
-                        );
+                oModel.setProperty("/progress", {
+                    percent: 0,
+                    display: `0%`
+                });
 
-                        const enriched = await Promise.all(
-                            aActualComponents.map(async (a) => {
-                                // try {
+                // Batch Size to process components in smaller groups (5 at a time)
+                const batchSize = 5;
+
+                for (let i = 0; i < sortedComponents.length; i += batchSize) {
+                    const batch = sortedComponents.slice(i, i + batchSize);
+
+                    const results = await Promise.all(
+                        batch.map(async (c) => {
+                            const { component, version, sequence } = c.bomComponent;
+
+                            const aActualComponents = aData.filter(item =>
+                                item.BOM_COMPONENT_MATERIAL === component &&
+                                item.BOM_COMPONENT_MATERIAL_VERSION === version &&
+                                item.BOM_COMPONENT_SEQUENCE === sequence
+                            );
+
+                            const enriched = await Promise.all(
+                                aActualComponents.map(async (a) => {
                                     const description = await this.getMaterialText({
                                         plant: oRequest.plant,
                                         material: a.BOM_COMPONENT_MATERIAL
@@ -214,69 +235,57 @@ sap.ui.define([
                                         MATERIAL_DESCRIPTION: description,
                                         DATA_FIELDS: oDataFields ?? []
                                     };
-                                // } catch (err) {
-                                //     console.error(err);
-                                //     throw err;
-                                // }
-                            })
-                        );
+                                })
+                            );
 
-                        c.actualComponents = enriched;
+                            c.actualComponents = enriched;
 
+                            // componentState Filter
+                            let include = false;
+                            
+                            switch (oRequest.componentState) {
+                                case "All": include = true; break;
+                                case "Assembled":
+                                    const assembled = c.actualComponents.filter(a => a.EVENT_TYPE !== "COMPONENT_REMOVE");
+                                    if (assembled.length > 0) { c.actualComponents = assembled; include = true; }
+                                    break;
+                                case "Unassembled":
+                                    const hasRemoveEvents = c.actualComponents.some(a => a.EVENT_TYPE === "COMPONENT_REMOVE");
+                                    include = (c.actualComponents.length === 0 || hasRemoveEvents);
+                                    break;
+                                case "AssembledUnassembled":
+                                    const assembledUnassembled = c.actualComponents.filter(a => a.EVENT_TYPE !== "COMPONENT_REMOVE");
+                                    if (c.actualComponents.length === 0 || assembledUnassembled.length > 0) {
+                                        c.actualComponents = assembledUnassembled;
+                                        include = true;
+                                    }
+                                    break;
+                                case "Removed":
+                                    const removed = c.actualComponents.filter(a => a.EVENT_TYPE === "COMPONENT_REMOVE");
+                                    if (removed.length > 0) { c.actualComponents = removed; include = true; }
+                                    break;
+                            }
 
-                        // -------------------------------
-                        // componentState Filter
-                        // -------------------------------
-                        let include = false;
+                            return include ? c : null;
+                        })
+                    );
 
-                        switch (oRequest.componentState) {
-                            case "All":
-                                include = true;
-                                break;
+                    results.filter(Boolean).forEach(r => oTemporalData.components.push(r));
 
-                            case "Assembled":
-                                const assembled = c.actualComponents.filter(a => a.EVENT_TYPE !== "COMPONENT_REMOVE");
-                                if (assembled.length > 0) {
-                                    c.actualComponents = assembled;
-                                    include = true;
-                                }
-                                break;
+                    oModel.setData(oTemporalData);
+                    oModel.refresh(true);
 
-                            case "Unassembled":
-                                include = c.actualComponents.length === 0;
-                                break;
+                    // Progress indicator
+                    loaded += batch.length;
+                    const percent = Math.round((loaded / total) * 100);
+                    oModel.setProperty("/progress", {
+                        percent,
+                        display: `${percent}%`
+                    });
 
-                            case "AssembledUnassembled":
-                                const assembledUnassembled = c.actualComponents.filter(a => a.EVENT_TYPE !== "COMPONENT_REMOVE");
-                                if (c.actualComponents.length === 0 || assembledUnassembled.length > 0) {
-                                    c.actualComponents = assembledUnassembled;
-                                    include = true;
-                                }
-                                break;
-
-                            case "Removed":
-                                const removed = c.actualComponents.filter(a => a.EVENT_TYPE === "COMPONENT_REMOVE");
-                                if (removed.length > 0) {
-                                    c.actualComponents = removed;
-                                    include = true;
-                                }
-                                break;
-                        }
-
-                        if (include) {
-                            oTemporalData.components.push(c);
-                        }
-
-                        oModel.setData(oTemporalData);
-                        oModel.refresh(true);
-
-                        // if (oRequest.componentState === 'Removed') {
-                        //     if (c.actualComponents.length > 0) oTemporalData.components.push(c);
-                        //     oModel.setData(oTemporalData);
-                        //     oModel.refresh(true);
-                        // }
-                    })
-                );
+                    // Give control to Event Loop
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
 
             } catch (oError) {
                 MessageToast.show(oError.message);
@@ -284,6 +293,25 @@ sap.ui.define([
         },
 
 
+        /**
+         * Convert a key-value map into an OData filter string.
+         *
+         * @function _objectToODataFilterString
+         * @param {Object.<string, (string|number|null|undefined)>} oFilterMap - 
+         *        A map of filter keys and values. Keys are OData field names,
+         *        values may be strings, numbers, null, or undefined.
+         *        Undefined values are ignored.
+         * @returns {string} An OData filter string composed of key-value pairs
+         *        joined with "and". String values are quoted, null values are left unquoted.
+         *
+         * @example
+         * // Returns "PLANT eq '1000' and SFC eq 'ABC123'"
+         * _objectToODataFilterString({ PLANT: "1000", SFC: "ABC123" });
+         *
+         * @example
+         * // Returns "PLANT eq '1000' and SFC_ASSEMBLY_EVENT_ID eq null"
+         * _objectToODataFilterString({ PLANT: "1000", SFC_ASSEMBLY_EVENT_ID: null });
+         */
         _objectToODataFilterString(oFilterMap) {
             return Object.entries(oFilterMap)
                 .filter(([sKey, sValue]) => typeof sValue !== "undefined")

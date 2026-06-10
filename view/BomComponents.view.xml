@@ -77,69 +77,81 @@
                 <uxap:subSections>
                     <uxap:ObjectPageSubSection>
                         <uxap:blocks>
-                            <Table
-                                id="idAsBuiltTable"
-                                inset="false"
-                                sticky="ColumnHeaders,HeaderToolbar"
-                                items="{ 
-                                        path: 'AsBuilt>/components',
-                                        sorter: {
-                                            path: 'bomComponent/sequence'
-                                        } 
-                                    }"
-                                itemPress=".onItemPress"
-                                mode="SingleSelectMaster"
-                                ariaLabelledBy="title"
-                                fixedLayout="true"
-                                growing="true"
-                                popinLayout="GridSmall"
-                                autoPopinMode="true" >
-                                <columns>
-                                    <Column importance="High" demandPopin="true">
-                                        <Text text="{i18n>asBuilt.tbl.sequence}" />
-                                    </Column>
-                                    <Column importance="High" demandPopin="true">
-                                        <Text text="{i18n>asBuilt.tbl.component}" />
-                                    </Column>
-                                    <Column>
-                                        <Text text="{i18n>asBuilt.tbl.version}" />
-                                    </Column>
-                                    <Column>
-                                        <Text text="{i18n>asBuilt.tbl.operation}" />
-                                    </Column>
-                                    <Column>
-                                        <Text text="{i18n>asBuilt.tbl.qtyRequired}" />
-                                    </Column>
-                                    <Column>
-                                        <Text text="{i18n>asBuilt.tbl.qtyAssembled}" />
-                                    </Column>
-                                    <Column>
-                                        <Text text="{i18n>asBuilt.tbl.componentType}" />
-                                    </Column>
-                                </columns>
+                            <VBox class="sapUiSmallMarginBottom">
+                                <ProgressIndicator
+                                    id="idProgress"
+                                    class="sapUiTinyMarginBottom"
+                                    percentValue="{AsBuilt>/progress/percent}"
+                                    displayValue="{AsBuilt>/progress/display}"
+                                    showValue="true"
+                                    displayOnly="true"
+                                    state="None"
+                                    width="100%" />
 
-                                <items>
-                                    <ColumnListItem
-                                        vAlign="Middle"
-                                        type="Navigation" >
-                                        <cells>
-                                            <Text text="{AsBuilt>bomComponent/sequence}" />
-                                            <ObjectIdentifier
-                                                title="{AsBuilt>bomComponent/component}"
-                                                text="{AsBuilt>bomComponent/description}" />
-                                            <Text text="{AsBuilt>bomComponent/version}" />
-                                            <Text text="{AsBuilt>bomComponent/operation}" />
-                                            <ObjectNumber
-                                                number="{AsBuilt>bomComponent/quantityRequired}"
-                                                unit="{AsBuilt>bomComponent/uom}" />
-                                            <ObjectNumber
-                                                number="{AsBuilt>bomComponent/quantityAssembled}"
-                                                unit="{AsBuilt>bomComponent/uom}" />
-                                            <Text text="{AsBuilt>bomComponent/componentType}" />
-                                        </cells>
-                                    </ColumnListItem>
-                                </items>
-                            </Table>
+                                <Table
+                                    id="idAsBuiltTable"
+                                    inset="false"
+                                    sticky="ColumnHeaders,HeaderToolbar"
+                                    items="{ 
+                                            path: 'AsBuilt>/components',
+                                            sorter: {
+                                                path: 'bomComponent/sequence'
+                                            } 
+                                        }"
+                                    itemPress=".onItemPress"
+                                    mode="SingleSelectMaster"
+                                    ariaLabelledBy="title"
+                                    fixedLayout="true"
+                                    growing="true"
+                                    popinLayout="GridSmall"
+                                    autoPopinMode="true" >
+                                    <columns>
+                                        <Column importance="High" demandPopin="true">
+                                            <Text text="{i18n>asBuilt.tbl.sequence}" />
+                                        </Column>
+                                        <Column importance="High" demandPopin="true">
+                                            <Text text="{i18n>asBuilt.tbl.component}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>asBuilt.tbl.version}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>asBuilt.tbl.operation}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>asBuilt.tbl.qtyRequired}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>asBuilt.tbl.qtyAssembled}" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="{i18n>asBuilt.tbl.componentType}" />
+                                        </Column>
+                                    </columns>
+
+                                    <items>
+                                        <ColumnListItem
+                                            vAlign="Middle"
+                                            type="Navigation" >
+                                            <cells>
+                                                <Text text="{AsBuilt>bomComponent/sequence}" />
+                                                <ObjectIdentifier
+                                                    title="{AsBuilt>bomComponent/component}"
+                                                    text="{AsBuilt>bomComponent/description}" />
+                                                <Text text="{AsBuilt>bomComponent/version}" />
+                                                <Text text="{AsBuilt>bomComponent/operation}" />
+                                                <ObjectNumber
+                                                    number="{AsBuilt>bomComponent/quantityRequired}"
+                                                    unit="{AsBuilt>bomComponent/uom}" />
+                                                <ObjectNumber
+                                                    number="{AsBuilt>bomComponent/quantityAssembled}"
+                                                    unit="{AsBuilt>bomComponent/uom}" />
+                                                <Text text="{AsBuilt>bomComponent/componentType}" />
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </VBox>
                         </uxap:blocks>
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
