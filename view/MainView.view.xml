@@ -8,7 +8,7 @@
     xmlns:form="sap.ui.layout.form"
     xmlns:fb="sap.ui.comp.filterbar"
     xmlns:layout="sap.ui.layout"
-    controllerName="mhp.pod2.zplugins.asbuiltreportplugin.controller.MainView"
+    controllerName="mhp.pod2.zplugins.AsBuiltReportPlugin.controller.MainView"
     width="100%"
     height="100%" >
     <VBox
@@ -81,11 +81,11 @@
             </f:layoutData>
 
             <f:beginColumnPages>
-                <mvc:XMLView viewName="mhp.pod2.zplugins.asbuiltreportplugin.view.BomComponents" />
+                <mvc:XMLView viewName="mhp.pod2.zplugins.AsBuiltReportPlugin.view.BomComponents" />
             </f:beginColumnPages>
 
             <f:midColumnPages>
-                <mvc:XMLView viewName="mhp.pod2.zplugins.asbuiltreportplugin.view.ActualComponents" />
+                <mvc:XMLView viewName="mhp.pod2.zplugins.AsBuiltReportPlugin.view.ActualComponents" />
             </f:midColumnPages>
         </f:FlexibleColumnLayout>
 

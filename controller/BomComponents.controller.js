@@ -8,8 +8,8 @@ sap.ui.define([
     "sap/dm/dme/pod2/api/RestClient",
     "sap/dm/dme/pod2/api/ApiPaths",
     "sap/dm/dme/pod2/widget/core/TableWidget",
-    "mhp/pod2/zplugins/asbuiltreportplugin/controller/utils/Commons",
-    "mhp/pod2/zplugins/asbuiltreportplugin/model/formatter",
+    "mhp/pod2/zplugins/AsBuiltReportPlugin/controller/utils/Commons",
+    "mhp/pod2/zplugins/AsBuiltReportPlugin/model/formatter",
 ], function (
     jQuery,
     MobileLibrary,
@@ -27,7 +27,7 @@ sap.ui.define([
 
     const { MessageBox, MessageToast } = MobileLibrary;
 
-    return Controller.extend("mhp.pod2.zplugins.asbuiltreportplugin.controller.MainView", {
+    return Controller.extend("mhp.pod2.zplugins.AsBuiltReportPlugin.controller.MainView", {
         Commons: Commons,
         formatter: formatter,
 

@@ -9,8 +9,8 @@ sap.ui.define([
     "sap/dm/dme/pod2/api/RestClient",
     "sap/dm/dme/pod2/api/ApiPaths",
     "sap/dm/dme/pod2/widget/core/TableWidget",
-    "mhp/pod2/zplugins/asbuiltreportplugin/controller/utils/Commons",
-    "mhp/pod2/zplugins/asbuiltreportplugin/model/formatter",
+    "mhp/pod2/zplugins/AsBuiltReportPlugin/controller/utils/Commons",
+    "mhp/pod2/zplugins/AsBuiltReportPlugin/model/formatter",
 ], function (
     jQuery,
     MobileLibrary,
@@ -29,7 +29,7 @@ sap.ui.define([
 
     const { MessageBox, MessageToast } = MobileLibrary;
 
-    return Controller.extend("mhp.pod2.zplugins.asbuiltreportplugin.controller.ActualComponents", {
+    return Controller.extend("mhp.pod2.zplugins.AsBuiltReportPlugin.controller.ActualComponents", {
         Commons: Commons,
         formatter: formatter,
 
@@ -56,7 +56,7 @@ sap.ui.define([
             if (!this._oDataFieldsPopover) {
                 Fragment.load({
                     id: "idDataFieldsPopover",
-                    name: "mhp.pod2.zplugins.asbuiltreportplugin.view.fragments.DataFieldsPopover",
+                    name: "mhp.pod2.zplugins.AsBuiltReportPlugin.view.fragments.DataFieldsPopover",
                     controller: this
                 }).then(function (oPopover) {
                     this._oDataFieldsPopover = oPopover;

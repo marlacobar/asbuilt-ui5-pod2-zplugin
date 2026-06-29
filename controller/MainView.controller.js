@@ -8,8 +8,8 @@ sap.ui.define([
     "sap/dm/dme/pod2/api/RestClient",
     "sap/dm/dme/pod2/api/ApiPaths",
     "sap/dm/dme/pod2/widget/core/TableWidget",
-    "mhp/pod2/zplugins/asbuiltreportplugin/controller/utils/Commons",
-    "mhp/pod2/zplugins/asbuiltreportplugin/model/formatter"
+    "mhp/pod2/zplugins/AsBuiltReportPlugin/controller/utils/Commons",
+    "mhp/pod2/zplugins/AsBuiltReportPlugin/model/formatter"
 ], function (
     jQuery,
     MobileLibrary,
@@ -27,13 +27,13 @@ sap.ui.define([
 
     const { MessageBox, MessageToast } = MobileLibrary;
 
-    return Controller.extend("mhp.pod2.zplugins.asbuiltreportplugin.controller.MainView", {
+    return Controller.extend("mhp.pod2.zplugins.AsBuiltReportPlugin.controller.MainView", {
         Commons: Commons,
         formatter: formatter,
 
         onInit: function () {
             const oView = this.getView();
-            const oResourceModel = new sap.ui.model.resource.ResourceModel({ bundleName: "mhp.pod2.zplugins.asbuiltreportplugin.i18n.i18n" });
+            const oResourceModel = new sap.ui.model.resource.ResourceModel({ bundleName: "mhp.pod2.zplugins.AsBuiltReportPlugin.i18n.i18n" });
             oView.setModel(oResourceModel, "i18n");
 
             // this.oFilterBar = oView.byId("filterBar");

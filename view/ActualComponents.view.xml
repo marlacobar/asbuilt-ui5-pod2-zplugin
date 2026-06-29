@@ -8,7 +8,7 @@
     xmlns:form="sap.ui.layout.form"
     xmlns:fb="sap.ui.comp.filterbar"
     xmlns:layout="sap.ui.layout"
-    controllerName="mhp.pod2.zplugins.asbuiltreportplugin.controller.ActualComponents"
+    controllerName="mhp.pod2.zplugins.AsBuiltReportPlugin.controller.ActualComponents"
     height="100%"
 >
     <uxap:ObjectPageLayout

@@ -9,8 +9,21 @@ sap.ui.define([
     "sap/dm/dme/pod2/api/ApiPaths",
     "sap/base/security/encodeURL",
     "sap/dm/dme/pod2/api/mdo/MDO",
-    "sap/dm/dme/pod2/api/odata/ODataV4Client"
-], function (MobileLibrary, SapUiCoreLibrary, JSONModel, Controller, History, ApiClient, RestClient, ApiPaths, encodeURL, MDO, ODataV4Client) {
+    "sap/dm/dme/pod2/api/odata/ODataV4Client",
+
+], function (
+    MobileLibrary, 
+    SapUiCoreLibrary, 
+    JSONModel, 
+    Controller, 
+    History, 
+    ApiClient, 
+    RestClient, 
+    ApiPaths, 
+    encodeURL, 
+    MDO, 
+    ODataV4Client,
+) {
     'use strict';
 
     const { Fragment, Priority } = SapUiCoreLibrary;

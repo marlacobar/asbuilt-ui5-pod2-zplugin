@@ -1,8 +1,8 @@
 {
     "widgets": [
         {
-            "modulePath": "mhp/pod2/zplugins/asbuiltreportplugin/plugin/asbuiltreportplugin",
-            "type": "mhp.pod2.zplugins.asbuiltreportplugin.plugin.asbuiltreportplugin"
+            "modulePath": "mhp/pod2/zplugins/AsBuiltReportPlugin/plugin/AsBuiltReportPlugin",
+            "type": "mhp.pod2.zplugins.AsBuiltReportPlugin.plugin.AsBuiltReportPlugin"
         }
     ]
 }

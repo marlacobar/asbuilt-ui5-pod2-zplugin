@@ -22,10 +22,10 @@ sap.ui.define([
 
     "use strict";
 
-    class asbuiltreportplugin extends Widget {
+    class AsBuiltReportPlugin extends Widget {
 
         static #oI18nModel = new I18nResourceModel({
-            bundleName: "mhp.pod2.zplugins.asbuiltreportplugin.i18n.i18n"
+            bundleName: "mhp.pod2.zplugins.AsBuiltReportPlugin.i18n.i18n"
         });
 
         static getI18nModel() {
@@ -37,7 +37,7 @@ sap.ui.define([
         }
 
         static getIcon() {
-            return "sap-icon://verified";
+            return "sap-icon://documents";
         }
 
         static getCategory() {
@@ -53,7 +53,7 @@ sap.ui.define([
 
             return XMLView.create({
                 id: oConfig.id,
-                viewName: "mhp.pod2.zplugins.asbuiltreportplugin.view.MainView"
+                viewName: "mhp.pod2.zplugins.AsBuiltReportPlugin.view.MainView"
             });
         } 
 
@@ -74,5 +74,5 @@ sap.ui.define([
         }
     }
 
-    return asbuiltreportplugin;
+    return AsBuiltReportPlugin;
 });

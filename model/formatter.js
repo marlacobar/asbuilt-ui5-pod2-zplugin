@@ -12,7 +12,7 @@ sap.ui.define([
 
         getEventTypeText: function (sEventType) {
             const oBundle = new sap.ui.model.resource.ResourceModel(
-                { bundleName: "mhp.pod2.zplugins.asbuiltreportplugin.i18n.i18n" }).getResourceBundle();
+                { bundleName: "mhp.pod2.zplugins.AsBuiltReportPlugin.i18n.i18n" }).getResourceBundle();
 
             switch (sEventType) {
                 case 'COMPONENT_REMOVE':
